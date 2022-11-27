@@ -18,8 +18,8 @@
 ###   Sound
      - 3D sound system added
      - Added effect rack for sound source
-     - Added effects { Distortion, Reverb }
-     - Added music { Perfect Count }
+     - Added effects [Distortion, Reverb]
+     - Added music [Perfect Count]
 ###   Graphics:
      - Render in 3D
      - Fog added
