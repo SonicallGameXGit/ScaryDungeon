@@ -64,17 +64,18 @@ public class TextureSetup {
         }
     }
     public void setState(int state) {
+        double aspect;
+
         if(textureDirection) {
-            double aspect = texture.getResolution().x / texture.getResolution().y;
-            textureState = textureState >= aspect ? 0 : textureState + 1;
-            offset.x = textureState;
-            scale.x = 1.0 / aspect;
+            aspect = texture.getResolution().x / texture.getResolution().y;
         } else {
-            double aspect = texture.getResolution().y / texture.getResolution().x;
-            textureState = textureState >= aspect ? 0 : textureState + 1;
-            offset.y = textureState;
-            scale.y = 1.0 / aspect;
+            aspect = texture.getResolution().y / texture.getResolution().x;
         }
+        textureState = textureState >= aspect - 1.0 ? 0 : state;
+        offset.y = textureState;
+        scale.y = 1.0 / aspect;
+
+        this.time = 0.0;
     }
 
     public double getTextureState() { return textureState; }

@@ -10,7 +10,6 @@ import org.sgx.sc.engine.io.Window;
 import org.sgx.sc.engine.io.audio.Sound;
 import org.sgx.sc.engine.io.audio.SoundPlayer;
 import org.sgx.sc.engine.io.audio.effect.EffectRack;
-import org.sgx.sc.engine.io.audio.effect.Reverb;
 import org.sgx.sc.engine.time.Time;
 import org.sgx.sc.game.io.SceneShader;
 import org.sgx.sc.game.math.TimeUtil;
@@ -19,6 +18,8 @@ import org.sgx.sc.game.scene.Player;
 import org.sgx.sc.game.scene.io.Map;
 
 public class Main {
+    private static final double CAMERA_SMOOTHNESS = 20.0;
+
     private static final char[][] testMap = new char[][] {
             {'#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'},
             {'#', ' ', 'I', 'L', ' ', ' ', ' ', ' ', 'L', ' ', ' ', ' ', 'I', 'K'},
@@ -31,8 +32,8 @@ public class Main {
     };
 
     public static void main(String[] args) {
-
-        Window window = new Window(1920.0 * 1.5, 1080.0 * 1.5, "Scary Dungeon", false, false);
+        Window window = new Window(1920.0 * 1.5, 1080.0 * 1.5, "Scary Dungeon", true, false);
+        window.setIcon("assets/textures/health_icon.png");
         window.changeBackground(new Vector3d(0.25f, 0.75f, 1.0f));
 
         Keyboard keyboard = new Keyboard(window);
@@ -42,8 +43,6 @@ public class Main {
 
         Map map = new Map(testMap);
 
-        Vector2d cameraPos = new Vector2d(3.0, 3.0);
-
         Vector2d spawnpoint = new Vector2d();
 
         for(int y = 0; y < testMap.length; y++) {
@@ -52,17 +51,19 @@ public class Main {
             }
         }
 
-        final double CAMERA_SMOOTHNESS = 20.0;
+        Vector2d cameraPos = new Vector2d(spawnpoint);
 
         SoundPlayer soundPlayer = new SoundPlayer();
 
         Sound testSound = new Sound("assets/sounds/soundtracks/perfect_count.ogg");
 
-        soundPlayer.play(testSound, new Vector2d(), 0.0, 1.0, true, new EffectRack());
+        soundPlayer.play(testSound, new Vector2d(), 1.0, 1.0, true, new EffectRack());
 
         Time time = new Time();
 
         Player player = new Player(time, new Transform(new Vector3d(spawnpoint.x(), spawnpoint.y() + 0.1, -0.001), new Vector3d(), new Vector3d(1.0)));
+
+        boolean fullscreen = false;
 
         while(window.getRunning()) {
             /* Prepare [START] */
@@ -70,8 +71,6 @@ public class Main {
             player.update(map.getMapColliders(), keyboard, time);
             map.playBlockAnimations(player.collider, time);
             /* Prepare [END] */
-
-            //System.out.println(mouse.getAbsolutePosition());
 
             cameraPos.x += TimeUtil.smooth(cameraPos.x(), player.transform.position.x(), CAMERA_SMOOTHNESS);
             cameraPos.y += TimeUtil.smooth(cameraPos.y(), player.transform.position.y(), CAMERA_SMOOTHNESS);
@@ -96,6 +95,12 @@ public class Main {
             /* IO [START] */
             if(keyboard.getPress(Keyboard.KEY_F5)) {
                 shader = new SceneShader();
+                map = new Map(testMap);
+            }
+            if(keyboard.getClick(Keyboard.KEY_F11)) {
+                fullscreen = !fullscreen;
+                window.setFullscreen(fullscreen);
+                mouse.grab(fullscreen);
             }
             /* IO [END] */
         }

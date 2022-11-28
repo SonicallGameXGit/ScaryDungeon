@@ -2,6 +2,7 @@ package org.sgx.sc.game.scene.io;
 
 import org.joml.Vector2d;
 import org.joml.Vector3d;
+import org.joml.Vector4d;
 import org.sgx.sc.engine.Transform;
 import org.sgx.sc.engine.io.texture.Texture;
 import org.sgx.sc.engine.time.Time;
@@ -38,7 +39,7 @@ public class Map {
                                         "assets/textures/brick.png",
                                         Texture.NEAREST),
                                 new Vector2d(), new Vector2d(50.0), TextureSetup.ANIMATED_TEXTURE_DIR_DOWN),
-                        new Vector3d(1.0)));
+                        new Vector4d(1.0)));
         for(int x = 0; x < map.length; x++) {
             for(int y = 0; y < map[x].length; y++) {
                 /* BRICK */
@@ -49,6 +50,19 @@ public class Map {
                 }
                 /* SKULL */
                 if(map[x][y] == 'K') animatedBlocks.get('K').add(BlockTypes.SKULL().setPosition(new Vector3d(y, map.length - x - 1.0, -0.002)));
+                /* LADDER */
+                if(y < map[x].length && y > 0 && map[x][y] == '^') {
+                    short type = 0;
+                    if(map[x][y - 1] == '#') type = 1;
+                    if(map[x][y + 1] == '#') type = (short) (type == 1 ? 3 : 2);
+                    Block ladder = BlockTypes.LADDER_NONE().setPosition(new Vector3d(y, map.length - x - 1.0, -0.002));
+                    if(type == 1) ladder = BlockTypes.LADDER_LEFT().setPosition(new Vector3d(y, map.length - x - 1.0, -0.002));
+                    if(type == 2) ladder = BlockTypes.LADDER_RIGHT().setPosition(new Vector3d(y, map.length - x - 1.0, -0.002));
+                    if(type == 3) ladder = BlockTypes.LADDER_BOTH().setPosition(new Vector3d(y, map.length - x - 1.0, -0.002));
+
+                    staticBlocks.add(ladder);
+                    colliders.add(ladder.collider);
+                }
             }
         }
     }

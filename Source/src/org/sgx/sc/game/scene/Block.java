@@ -25,12 +25,19 @@ public class Block {
     public Block(Transform transform, Material material) {
         this.transform = transform;
         this.material = material;
-        this.collider = new Collider(new Vector2d(transform.position.x(), transform.position.y()), new Vector2d(transform.scale.x(), transform.scale.y()));
+        this.collider = new Collider(new Vector2d(transform.position.x(), transform.position.y()), new Vector2d(transform.scale.x(), transform.scale.y()), Collider.SOLID_TYPE);
+
+        latestTransform = new Transform(transform);
+    }
+    public Block(Transform transform, Material material, short colliderType) {
+        this.transform = transform;
+        this.material = material;
+        this.collider = new Collider(new Vector2d(transform.position.x(), transform.position.y()), new Vector2d(transform.scale.x(), transform.scale.y()), colliderType);
 
         latestTransform = new Transform(transform);
     }
 
-    public Block setPosition(Vector3d position) { return new Block(transform.setPosition(position), material, new Collider(new Vector2d(position.x(), position.y()), collider.scale)); }
+    public Block setPosition(Vector3d position) { return new Block(transform.setPosition(position), material, new Collider(new Vector2d(position.x(), position.y()), collider.scale, collider.getType())); }
     public Block setMaterial(Material material) { return new Block(transform, material, collider); }
 
     public void saveTransform(Transform transform) {

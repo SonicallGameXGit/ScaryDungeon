@@ -28,7 +28,7 @@ public class SceneShader extends Shader {
         setVariable(createVariable("textureSampler"), 0);
     }
 
-    public void setColor(Vector3d color) { setVariable(colorId, color); }
+    public void setColor(Vector4d color) { setVariable(colorId, color); }
     public void setProject(double fieldOfView, Vector2d windowScale, double near, double far) {
         double frustum = far - near;
         double aspect = windowScale.x / windowScale.y;

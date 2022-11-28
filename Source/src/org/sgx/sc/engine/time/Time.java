@@ -2,7 +2,7 @@ package org.sgx.sc.engine.time;
 
 public class Time {
     private double lastTime;
-    private double startTime;
+    private final double startTime;
     private double time;
     private double delta;
 
@@ -15,6 +15,7 @@ public class Time {
     public void update() {
         double currentTime = System.nanoTime();
         delta = (currentTime - lastTime) / 1000000000.0;
+        if(delta >= 0.15) delta = 0.0;
         lastTime = currentTime;
         time = (System.nanoTime() - startTime) / 1000000000.0;
     }

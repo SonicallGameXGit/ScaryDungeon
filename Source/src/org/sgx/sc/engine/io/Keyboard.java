@@ -2,6 +2,9 @@ package org.sgx.sc.engine.io;
 
 import org.lwjgl.glfw.GLFW;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Keyboard {
     public static final int
             KEY_SPACE         = 32,
@@ -134,15 +137,36 @@ public class Keyboard {
 
     private final long window;
 
-    public Keyboard(Window window) { this.window = window.getCore(); }
+    private final Map<Integer, Boolean> canClick = new HashMap<>();
+
+    public Keyboard(Window window) {
+        this.window = window.getCore();
+
+        for(int i = 32; i <= 162; i++) canClick.put(i, false);
+        for(int i = 256; i <= 348; i++) canClick.put(i, false);
+
+        canClick.put(0x1, false);
+        canClick.put(0x2, false);
+        canClick.put(0x4, false);
+        canClick.put(0x8, false);
+        canClick.put(0x10, false);
+        canClick.put(0x20, false);
+    }
 
     public boolean getPress(int key) { return GLFW.glfwGetKey(window, key) == GLFW.GLFW_PRESS; }
+    public boolean getClick(int key) {
+        boolean clicked = canClick.get(key) && GLFW.glfwGetKey(window, key) == GLFW.GLFW_PRESS;
+
+        canClick.replace(key, GLFW.glfwGetKey(window, key) == GLFW.GLFW_RELEASE);
+
+        return clicked;
+    }
     public boolean getAnyPress(int[] keys) {
-        for(int key : keys) if(GLFW.glfwGetKey(window, key) == GLFW.GLFW_PRESS) return true;
+        for(int key : keys) if(getPress(key)) return true;
         return false;
     }
     public boolean getAllPress(int[] keys) {
-        for(int key : keys) if(GLFW.glfwGetKey(window, key) != GLFW.GLFW_PRESS) return false;
+        for(int key : keys) if(!getPress(key)) return false;
         return true;
     }
 }

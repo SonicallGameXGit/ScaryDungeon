@@ -1,9 +1,6 @@
 package org.sgx.sc.engine.io;
 
-import org.joml.Vector2d;
 import org.lwjgl.glfw.GLFW;
-
-import java.nio.DoubleBuffer;
 
 public class Mouse {
     public static final int
@@ -22,8 +19,7 @@ public class Mouse {
 
     public boolean getPress(int button) { return GLFW.glfwGetMouseButton(window, button) == GLFW.GLFW_PRESS; }
 
-    public Vector2d getAbsolutePosition() {
-        //DoubleBuffer buffer = GLFW.glfwGetCursorPos(window, position.x(), position.y());
-        return null;
+    public void grab(boolean grabbed) {
+        GLFW.glfwSetInputMode(window, GLFW.GLFW_CURSOR, grabbed ? GLFW.GLFW_CURSOR_DISABLED : GLFW.GLFW_CURSOR_NORMAL);
     }
 }

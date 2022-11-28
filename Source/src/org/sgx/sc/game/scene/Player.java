@@ -1,7 +1,7 @@
 package org.sgx.sc.game.scene;
 
 import org.joml.Vector2d;
-import org.joml.Vector3d;
+import org.joml.Vector4d;
 import org.sgx.sc.engine.Transform;
 import org.sgx.sc.engine.io.Keyboard;
 import org.sgx.sc.engine.io.texture.Texture;
@@ -17,32 +17,40 @@ public class Player extends Block {
     private static final double WALK_SPEED = 6.0;
     private static final double FALL_SPEED = 28.0;
     private static final double JUMP_SPEED = 8.5;
+    private static final double LADDER_SPEED = 5.0;
+    private static final double LADDER_ANIMATION_SPEED = 20.0;
     private static final double WALK_SMOOTHNESS = 4.0;
     private static final double WALK_ANIMATION_SPEED = 38.0;
+    private static final double IDLE_ANIMATION_SPEED = 1.5;
 
     private static final Vector2d ACTUAL_SCALE = new Vector2d(0.5, 0.875);
 
     private final TextureSetup idleTextureSetup;
     private final TextureSetup walkTextureSetup;
+    private final TextureSetup onLadderTextureSetup;
 
     private final Vector2d direction;
     private final Vector2d finalDirection;
 
     private boolean onGround;
+    private boolean onLadder;
 
     private double walkSpeed;
     private double smoothedWalkSpeed;
 
     public Player(Time time, Transform transform) {
-        super(transform, new Material(new TextureSetup(new Texture("assets/textures/animated/player_idle.png", Texture.NEAREST), new Vector2d(), new Vector2d(1.0), TextureSetup.ANIMATED_TEXTURE_DIR_DOWN), new Vector3d(1.0)), new Collider(new Vector2d(transform.position.x() + ACTUAL_OFFSET, transform.position.y()), new Vector2d(transform.scale.x() * ACTUAL_SCALE.x(), transform.scale.y() * ACTUAL_SCALE.y())));
+        super(transform, new Material(new TextureSetup(new Texture("assets/textures/animated/player_idle.png", Texture.NEAREST), new Vector2d(), new Vector2d(1.0), TextureSetup.ANIMATED_TEXTURE_DIR_DOWN), new Vector4d(0.7)), new Collider(new Vector2d(transform.position.x() + ACTUAL_OFFSET, transform.position.y()), new Vector2d(transform.scale.x() * ACTUAL_SCALE.x(), transform.scale.y() * ACTUAL_SCALE.y()), Collider.SOLID_TYPE));
         material.textureSetup.setState(0);
         idleTextureSetup = material.textureSetup;
+        onLadderTextureSetup = new TextureSetup(new Texture("assets/textures/animated/player_on_ladder.png", Texture.NEAREST), new Vector2d(), new Vector2d(1.0), TextureSetup.ANIMATED_TEXTURE_DIR_DOWN);
         walkTextureSetup = new TextureSetup(new Texture("assets/textures/animated/player_walk.png", Texture.NEAREST), new Vector2d(), new Vector2d(1.0), TextureSetup.ANIMATED_TEXTURE_DIR_DOWN);
         direction = new Vector2d();
         finalDirection = new Vector2d();
         onGround = false;
-        idleTextureSetup.playTextureAnimation(time, TextureSetup.ANIMATION_PLAY_FORWARDS, 1.5);
-        walkTextureSetup.playTextureAnimation(time, TextureSetup.ANIMATION_PLAY_FORWARDS, smoothedWalkSpeed * WALK_ANIMATION_SPEED);
+        onLadder = false;
+        idleTextureSetup.setState(0);
+        walkTextureSetup.setState(0);
+        onLadderTextureSetup.setState(0);
         walkSpeed = 0.0;
         material.textureSetup = idleTextureSetup;
         smoothedWalkSpeed = 0.0;
@@ -50,19 +58,29 @@ public class Player extends Block {
 
     public void update(List<Collider> blocks, Keyboard keyboard, Time time) {
         /* Update Visual [START] */
-        idleTextureSetup.playTextureAnimation(time, TextureSetup.ANIMATION_PLAY_FORWARDS, 1.5);
+        idleTextureSetup.playTextureAnimation(time, TextureSetup.ANIMATION_PLAY_FORWARDS, IDLE_ANIMATION_SPEED);
         walkTextureSetup.playTextureAnimation(time, TextureSetup.ANIMATION_PLAY_FORWARDS, smoothedWalkSpeed * WALK_ANIMATION_SPEED);
         material.textureSetup = idleTextureSetup;
         /* Update Visual [END] */
 
         /* Update Control [START] */
         // Y Control
-        // Change Y direction with gravity and by checking keys W / UP or S / DOWN press
-        direction.y -= FALL_SPEED * time.getDelta();
+        if(!onLadder) {
+            // Change Y direction with gravity and by checking keys W / UP or S / DOWN press
+            direction.y -= FALL_SPEED * time.getDelta();
 
-        if(keyboard.getAnyPress(new int[] { Keyboard.KEY_SPACE, Keyboard.KEY_UP, Keyboard.KEY_W }) && onGround) direction.y = JUMP_SPEED;
+            if(keyboard.getAnyPress(new int[] { Keyboard.KEY_SPACE, Keyboard.KEY_UP, Keyboard.KEY_W }) && onGround) direction.y = JUMP_SPEED;
+        } else {
+            // Change Y direction on ladder with controls
+            direction.y = 0.0;
+
+            if(keyboard.getAnyPress(new int[] { Keyboard.KEY_SPACE, Keyboard.KEY_UP, Keyboard.KEY_W })) direction.y = LADDER_SPEED;
+            if(keyboard.getAnyPress(new int[] { Keyboard.KEY_LEFT_SHIFT, Keyboard.KEY_RIGHT_SHIFT, Keyboard.KEY_DOWN, Keyboard.KEY_S })) direction.y = -LADDER_SPEED;
+            if(keyboard.getAnyPress(new int[] { Keyboard.KEY_SPACE, Keyboard.KEY_UP, Keyboard.KEY_W }) && keyboard.getAnyPress(new int[] { Keyboard.KEY_LEFT_SHIFT, Keyboard.KEY_RIGHT_SHIFT, Keyboard.KEY_DOWN, Keyboard.KEY_S })) direction.y = 0.0;
+        }
 
         onGround = false;
+        onLadder = false;
 
         transform.position.y += direction.y() * time.getDelta();
         collider.position.y = transform.position.y();
@@ -70,10 +88,12 @@ public class Player extends Block {
         // Move player in Y direction and check collision
         for(Collider block : blocks) {
             if(Collider.getCollision(collider, block)) {
-                transform.position.y -= direction.y() * time.getDelta();
-                onGround = direction.y < 0.0;
-                direction.y = 0.0;
-                break;
+                if(block.getType() == Collider.LADDER_TYPE) onLadder = true;
+                if(block.getType() == Collider.SOLID_TYPE) {
+                    transform.position.y -= direction.y() * time.getDelta();
+                    onGround = direction.y < 0.0;
+                    direction.y = 0.0;
+                }
             }
         }
 
@@ -105,7 +125,7 @@ public class Player extends Block {
         collider.position.x = transform.position.x() + ACTUAL_OFFSET;
 
         for(Collider block : blocks) {
-            if(Collider.getCollision(collider, block)) {
+            if(Collider.getCollision(collider, block) && block.getType() == Collider.SOLID_TYPE) {
                 transform.position.x -= finalDirection.x() * WALK_SPEED * time.getDelta();
                 finalDirection.x = 0.0;
                 smoothedWalkSpeed = 0.0;
@@ -124,5 +144,12 @@ public class Player extends Block {
         }
 
         collider.position.x = transform.position.x() + ACTUAL_OFFSET;
+
+        if(onLadder) {
+            if(direction.y < 0.0) onLadderTextureSetup.playTextureAnimation(time, TextureSetup.ANIMATION_PLAY_BACKWARDS, LADDER_ANIMATION_SPEED);
+            if(direction.y > 0.0) onLadderTextureSetup.playTextureAnimation(time, TextureSetup.ANIMATION_PLAY_FORWARDS, LADDER_ANIMATION_SPEED);
+
+            material.setTextureSetup(onLadderTextureSetup);
+        }
     }
 }
