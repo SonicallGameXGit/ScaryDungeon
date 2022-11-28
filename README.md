@@ -1,4 +1,4 @@
-# ScaryDungeon - THE FIRST VERSION OF THE GAME
+# ScaryDungeon v0.0.02pre-alpha
 ScaryDungeon - 2D Platformer game, created in Java with LWJGL3 library
 # 
 ## Installation (Versions: 0.0.01pre-alpha - 0.0.02pre-alpha)
@@ -17,4 +17,5 @@ ScaryDungeon - 2D Platformer game, created in Java with LWJGL3 library
 ## Controlls:
     - D / Right - Run right
     - A / Left - Run left
-    - W / Space / Up - Jump
+    - W / Space / Up - Jump / Go Up
+    - S / Left Shift / Right Shift / Down - Go Down
