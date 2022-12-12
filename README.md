@@ -1,7 +1,7 @@
-# ScaryDungeon v0.0.02pre-alpha
+# ScaryDungeon v0.0.03pre-alpha
 ScaryDungeon - 2D Platformer game, created in Java with LWJGL3 library
 # 
-## Installation (Versions: 0.0.01pre-alpha - 0.0.02pre-alpha)
+## Installation (Versions: 0.0.01pre-alpha - 0.0.03pre-alpha)
   - Download zip of game in branch, named with game version
 ![How to download zip of game tutorial](/assets/images/readme/downloadziptutorial.png)
 ## 
