@@ -19,6 +19,7 @@ import java.util.List;
 public class Map {
     private static final double SKULL_ANIMATION_SPEED = 4.0;
     private static final double SKULL_FLOAT_SPEED = 1.5;
+    private static final double LAVA_ANIMATION_SPEED = 16.0;
 
     private final List<Block> staticBlocks = new ArrayList<>();
     private final List<Collider> colliders = new ArrayList<>();
@@ -28,6 +29,8 @@ public class Map {
 
     public Map(char[][] map) {
         animatedBlocks.put('K', new ArrayList<>());
+        animatedBlocks.put('l', new ArrayList<>());
+        animatedBlocks.put('O', new ArrayList<>());
         background = new Block(
                 new Transform(
                         new Vector3d(-25.0, -25.0, -2.5),
@@ -63,6 +66,18 @@ public class Map {
                     staticBlocks.add(ladder);
                     colliders.add(ladder.collider);
                 }
+                /* LAVA */
+                if(map[x][y] == 'l') {
+                    Block lava = BlockTypes.LAVA().setPosition(new Vector3d(y, map.length - x - 1.0, -0.002));
+                    animatedBlocks.get('l').add(lava);
+                    colliders.add(lava.collider);
+                }
+                /* ORB */
+                if(map[x][y] == 'O') {
+                    Block orb = BlockTypes.ORB().setPosition(new Vector3d(y, map.length - x - 1.0, -0.002));
+                    animatedBlocks.get('O').add(orb);
+                    colliders.add(orb.collider);
+                }
             }
         }
     }
@@ -85,6 +100,13 @@ public class Map {
             block.material.textureSetup.playTextureAnimation(time, TextureSetup.ANIMATION_PLAY_FORWARDS, SKULL_ANIMATION_SPEED);
             Vector2d latest = new Vector2d(block.getLatestTransformSave().position.x(), block.getLatestTransformSave().position.y());
             block.transform.position.y = latest.y() + Math.sin(SKULL_FLOAT_SPEED * time.getTime()) * 0.05 - 0.05;
+        }
+        for(Block block : animatedBlocks.get('l')) block.material.textureSetup.playTextureAnimation(time, TextureSetup.ANIMATION_PLAY_FORWARDS, LAVA_ANIMATION_SPEED);
+        for(Block block : animatedBlocks.get('O')) {
+            block.transform.position.x = block.getLatestTransformSave().position.x + (Math.cos(time.getTime() * 0.4) / 2.0 + 0.5) * 0.1;
+            block.transform.position.y = block.getLatestTransformSave().position.y + (Math.sin(time.getTime() * 0.5) / 2.0 + 0.5) * 0.1;
+            block.transform.scale.x = block.getLatestTransformSave().scale.x + (Math.cos(time.getTime() * 0.7) / 2.0 + 0.5) * 0.05;
+            block.transform.scale.y = block.getLatestTransformSave().scale.y + (Math.sin(time.getTime() * 0.76) / 2.0 + 0.5) * 0.05;
         }
     }
 

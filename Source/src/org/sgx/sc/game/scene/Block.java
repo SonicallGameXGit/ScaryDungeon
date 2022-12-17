@@ -2,6 +2,7 @@ package org.sgx.sc.game.scene;
 
 import org.joml.Vector2d;
 import org.joml.Vector3d;
+import org.joml.Vector4d;
 import org.sgx.sc.engine.Transform;
 import org.sgx.sc.engine.graphics.Mesh;
 import org.sgx.sc.game.io.SceneShader;

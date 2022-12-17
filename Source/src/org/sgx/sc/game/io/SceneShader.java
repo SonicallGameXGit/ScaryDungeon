@@ -56,11 +56,12 @@ public class SceneShader extends Shader {
     public void setTransform(Transform transform) {
         Matrix4f matrix = new Matrix4f();
         matrix.identity();
-        matrix.translate(new Vector3f((float) transform.position.x, (float) transform.position.y, (float) transform.position.z));
+        matrix.translate(new Vector3f((float) (transform.position.x - transform.anchor.x), (float) (transform.position.y - transform.anchor.y), (float) (transform.position.z - transform.anchor.z)));
         matrix.rotate((float) Math.toRadians(transform.rotation.x), new Vector3f(1.0f, 0.0f, 0.0f), matrix);
         matrix.rotate((float) Math.toRadians(transform.rotation.y), new Vector3f(0.0f, 1.0f, 0.0f), matrix);
         matrix.rotate((float) Math.toRadians(transform.rotation.z), new Vector3f(0.0f, 0.0f, 1.0f), matrix);
         matrix.scale(new Vector3f((float) transform.scale.x, (float) transform.scale.y, (float) transform.scale.z));
+        matrix.translate(new Vector3f((float) transform.anchor.x, (float) transform.anchor.y, (float) transform.anchor.z));
 
         setVariable(transformId, matrix);
     }

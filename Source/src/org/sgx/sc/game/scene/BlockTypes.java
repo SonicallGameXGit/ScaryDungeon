@@ -105,4 +105,39 @@ public abstract class BlockTypes {
                                 TextureSetup.ANIMATED_TEXTURE_DIR_DOWN),
                         new Vector4d(1.0)), Collider.LADDER_TYPE);
     }
+    public static Block LAVA() {
+        return new Block(
+                new Transform(
+                        new Vector3d(),
+                        new Vector3d(),
+                        new Vector3d(1.0)),
+                new Material(
+                        new TextureSetup(
+                                new Texture(
+                                        "assets/textures/animated/lava.png",
+                                        Texture.NEAREST),
+                                new Vector2d(),
+                                new Vector2d(1.0),
+                                TextureSetup.ANIMATED_TEXTURE_DIR_DOWN),
+                        new Vector4d(1.0)),
+                new Collider(new Vector2d(), new Vector2d(1.0, 0.05), Collider.LAVA_TYPE));
+    }
+    public static Block ORB() {
+        return new Block(
+                new Transform(
+                        new Vector3d(0.25, 0.25, 0.0),
+                        new Vector3d(),
+                        new Vector3d(0.5, 0.5, 1.0),
+                        new Vector3d(0.25, 0.25, 0.0)),
+                new Material(
+                        new TextureSetup(
+                                new Texture(
+                                        "assets/textures/jump_orb.png",
+                                        Texture.NEAREST),
+                                new Vector2d(),
+                                new Vector2d(1.0),
+                                TextureSetup.ANIMATED_TEXTURE_DIR_DOWN),
+                        new Vector4d(1.0, 1.0, 1.0, 0.75)),
+                new Collider(new Vector2d(0.25, 0.25), new Vector2d(0.5, 0.5), Collider.ORB_TYPE));
+    }
 }

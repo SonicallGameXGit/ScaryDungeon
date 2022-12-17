@@ -5,6 +5,8 @@ import org.joml.Vector2d;
 public class Collider {
     public static final short SOLID_TYPE = 0;
     public static final short LADDER_TYPE = 1;
+    public static final short LAVA_TYPE = 2;
+    public static final short ORB_TYPE = 3;
 
     private short type;
 

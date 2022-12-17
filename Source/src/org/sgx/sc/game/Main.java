@@ -1,5 +1,6 @@
 package org.sgx.sc.game;
 
+import org.joml.Random;
 import org.joml.Vector2d;
 import org.joml.Vector3d;
 import org.sgx.sc.engine.Camera;
@@ -26,8 +27,9 @@ public class Main {
             {'#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'D', 'E'},
             {'#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#', '#'},
             {'#', ' ', 'D', ' ', ' ', ' ', '#', ' ', '^', ' ', ' ', ' ', ' ', '#'},
-            {'#', ' ', ' ', ' ', '#', ' ', '^', ' ', '^', ' ', ' ', ' ', 'S', '#'},
+            {'#', ' ', ' ', ' ', '#', ' ', '^', ' ', '^', ' ', 'O', ' ', 'S', '#'},
             {'#', 'T', '#', 'G', '^', ' ', '^', 'G', '^', ' ', '-', 'G', 'G', '#'},
+            {'#', '#', '#', '#', '#', '#', '#', '#', '#', 'l', 'l', 'l', 'l', '#'},
             {'#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'}
     };
 
@@ -55,13 +57,16 @@ public class Main {
 
         SoundPlayer soundPlayer = new SoundPlayer();
 
-        Sound testSound = new Sound("assets/sounds/soundtracks/perfect_count.ogg");
+        Sound[] soundtracks = new Sound[] {
+                new Sound("assets/sounds/soundtracks/perfect_count.ogg"),
+                new Sound("assets/sounds/soundtracks/clockworks.ogg")
+        };
 
-        soundPlayer.play(testSound, new Vector2d(), 1.0, 1.0, true, new EffectRack());
+        soundPlayer.play(soundtracks[new Random().nextInt(2)], new Vector2d(), 1.0, 1.0, true, new EffectRack());
 
         Time time = new Time();
 
-        Player player = new Player(time, new Transform(new Vector3d(spawnpoint.x(), spawnpoint.y() + 0.1, -0.001), new Vector3d(), new Vector3d(1.0)));
+        Player player = new Player(new Transform(new Vector3d(spawnpoint.x(), spawnpoint.y() + 0.1, -0.001), new Vector3d(), new Vector3d(1.0)));
 
         boolean fullscreen = false;
 
@@ -72,8 +77,10 @@ public class Main {
             map.playBlockAnimations(player.collider, time);
             /* Prepare [END] */
 
-            cameraPos.x += TimeUtil.smooth(cameraPos.x(), player.transform.position.x(), CAMERA_SMOOTHNESS);
-            cameraPos.y += TimeUtil.smooth(cameraPos.y(), player.transform.position.y(), CAMERA_SMOOTHNESS);
+            if(player.getHealth() > 0.0) {
+                cameraPos.x += TimeUtil.smooth(cameraPos.x(), player.transform.position.x(), CAMERA_SMOOTHNESS);
+                cameraPos.y += TimeUtil.smooth(cameraPos.y(), player.transform.position.y(), CAMERA_SMOOTHNESS);
+            }
 
             /* Render [START] */
             window.update();
@@ -101,6 +108,10 @@ public class Main {
                 fullscreen = !fullscreen;
                 window.setFullscreen(fullscreen);
                 mouse.grab(fullscreen);
+            }
+            if(player.getRebirth()) {
+                map = new Map(testMap);
+                player = new Player(new Transform(new Vector3d(spawnpoint.x(), spawnpoint.y() + 0.1, -0.001), new Vector3d(), new Vector3d(1.0)));
             }
             /* IO [END] */
         }
